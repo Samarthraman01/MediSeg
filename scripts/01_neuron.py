@@ -22,7 +22,3 @@ for step in range(100):
     
     if step%10 == 0:
         print(f"Step {step:3d} - loss: {loss:.4f} weight: {weight:.4f} prediction: {prediction:.4f}")
-    
-print(f"\nFinal weight: {weight:.4f}")
-print(f"Final prediction: {rupee * weight + bias:.4f}")
-print(f"Correct answer: {correct}")
