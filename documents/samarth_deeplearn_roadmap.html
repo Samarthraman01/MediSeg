@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samarth — Deep Learning Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090b;--bg2:#111114;--bg3:#18181c;--bg4:#1e1e24;
+  --border:#27272f;--border2:#38383f;
+  --text:#f0f0f4;--text2:#8888a0;--text3:#4a4a60;
+  --blue:#3b82f6;--blue2:#60a5fa;--blue-dim:rgba(59,130,246,0.12);
+  --orange:#f97316;--orange2:#fb923c;--orange-dim:rgba(249,115,22,0.12);
+  --green:#22c55e;--green-dim:rgba(34,197,94,0.12);
+  --purple:#a855f7;--purple-dim:rgba(168,85,247,0.12);
+  --red:#ef4444;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Inter',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;line-height:1.5}
+
+/* ── Header ── */
+.header{
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:2rem 2.5rem;
+  position:sticky;top:0;z-index:100;
+}
+.header-row{display:flex;align-items:flex-start;justify-content:space-between;gap:2rem;flex-wrap:wrap}
+.header-label{font-family:var(--mono);font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--blue2);margin-bottom:6px}
+.header-title{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.02em}
+.header-sub{font-size:12px;color:var(--text2);margin-top:5px;font-weight:300}
+
+/* dual progress */
+.dual-progress{display:flex;flex-direction:column;gap:8px;min-width:200px}
+.prog-row{display:flex;align-items:center;gap:10px}
+.prog-label{font-family:var(--mono);font-size:10px;color:var(--text3);width:72px;text-align:right;flex-shrink:0}
+.prog-track{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.prog-fill-blue{height:100%;background:var(--blue);border-radius:2px;transition:width 0.5s ease}
+.prog-fill-orange{height:100%;background:var(--orange);border-radius:2px;transition:width 0.5s ease}
+.prog-count{font-family:var(--mono);font-size:10px;color:var(--text3);width:36px}
+
+/* stats */
+.stats-row{display:flex;gap:1.5rem;margin-top:1rem;flex-wrap:wrap}
+.stat{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--text3)}
+.dot{width:5px;height:5px;border-radius:50%}
+
+/* ── Layout ── */
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 120px)}
+
+/* ── Sidebar ── */
+.sidebar{
+  background:var(--bg2);border-right:1px solid var(--border);
+  padding:1.5rem 0;
+  position:sticky;top:120px;
+  height:calc(100vh - 120px);
+  overflow-y:auto;
+}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2)}
+.sb-section{padding:0 1rem;margin-bottom:1.5rem}
+.sb-label{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;padding:0 4px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:8px;cursor:pointer;
+  transition:background 0.15s;margin-bottom:2px;
+}
+.nav-item:hover{background:var(--bg3)}
+.nav-item.active{background:var(--bg4)}
+.nav-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.nav-text{font-size:12px;color:var(--text2);line-height:1.3;flex:1}
+.nav-count{font-family:var(--mono);font-size:10px;color:var(--text3)}
+
+/* daily box */
+.daily-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;margin:0 1rem}
+.daily-title{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.daily-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.daily-bar{flex:1;height:6px;border-radius:3px;background:var(--border)}
+.daily-fill-blue{height:100%;width:50%;background:var(--blue);border-radius:3px}
+.daily-fill-orange{height:100%;width:50%;background:var(--orange);border-radius:3px}
+.daily-text{font-size:11px;color:var(--text2)}
+.daily-tag{font-family:var(--mono);font-size:10px}
+
+/* ── Content ── */
+.content{padding:2rem 2.5rem;overflow-y:auto}
+.track{display:none}
+.track.active{display:block}
+
+/* phase header */
+.phase-header{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.phase-badge{font-family:var(--mono);font-size:9px;font-weight:600;padding:4px 10px;border-radius:5px;letter-spacing:0.08em;text-transform:uppercase}
+.phase-info{}
+.phase-title{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-0.01em}
+.phase-desc{font-size:12px;color:var(--text2);margin-top:3px;font-weight:300}
+
+/* week card */
+.weeks-list{display:flex;flex-direction:column;gap:12px;margin-bottom:2.5rem}
+.week-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;cursor:pointer;
+  transition:border-color 0.15s,background 0.15s;
+  position:relative;
+}
+.week-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;opacity:0;transition:opacity 0.2s}
+.week-card:hover{border-color:var(--border2);background:var(--bg3)}
+.week-card:hover::before{opacity:1}
+.week-card.done{border-color:rgba(34,197,94,0.4)}
+.week-card.done::before{opacity:1;background:var(--green)}
+.week-card.active-week{border-color:rgba(59,130,246,0.5)}
+.week-card.active-week::before{opacity:1;background:var(--blue)}
+.week-card.blue::before{background:var(--blue)}
+.week-card.orange::before{background:var(--orange)}
+.week-card.purple::before{background:var(--purple)}
+
+.week-top{
+  display:grid;grid-template-columns:1fr 1fr;
+  border-bottom:1px solid var(--border);
+}
+.week-col{padding:14px 16px}
+.week-col:first-child{border-right:1px solid var(--border)}
+.week-col-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:0.12em;
+  text-transform:uppercase;margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+.week-col-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;line-height:1.3}
+.week-col-sub{font-size:11px;color:var(--text2);line-height:1.5}
+
+.week-bottom{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px;
+}
+.week-num{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.week-tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:4px}
+.tag-blue{background:var(--blue-dim);color:var(--blue2)}
+.tag-orange{background:var(--orange-dim);color:var(--orange2)}
+.tag-green{background:var(--green-dim);color:var(--green)}
+.tag-purple{background:var(--purple-dim);color:var(--purple)}
+.week-status{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:20px}
+.status-done{background:var(--green-dim);color:var(--green)}
+.status-now{background:var(--blue-dim);color:var(--blue2)}
+.status-todo{background:var(--bg4);color:var(--text3)}
+
+/* detail panel */
+.detail{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:14px;padding:1.5rem;margin-top:10px;
+  display:none;animation:fadeUp 0.2s ease;
+}
+.detail.open{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.detail-section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.detail-body{font-size:12px;color:var(--text2);line-height:1.75}
+.detail-connection{
+  font-size:12px;color:var(--blue2);line-height:1.75;
+  background:var(--blue-dim);border-left:2px solid var(--blue);
+  padding:10px 14px;border-radius:0 8px 8px 0;margin-top:4px;
+}
+.detail-steps{list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.detail-steps li{font-size:12px;color:var(--text2);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.step-num{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px;flex-shrink:0}
+.detail-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)}
+.action-btn{
+  font-size:11px;padding:6px 14px;border-radius:7px;
+  border:1px solid var(--border2);background:var(--bg2);
+  color:var(--text2);cursor:pointer;font-family:var(--sans);
+  transition:all 0.15s;
+}
+.action-btn:hover{background:var(--border);border-color:var(--blue);color:var(--blue2)}
+.action-btn.primary{background:var(--blue-dim);border-color:var(--blue);color:var(--blue2)}
+.action-btn.primary:hover{background:rgba(59,130,246,0.2)}
+.mark-btns{display:flex;gap:6px;margin-left:auto}
+.mark-btn{font-family:var(--mono);font-size:10px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--text2);transition:all 0.15s}
+.mark-done-btn:hover{border-color:var(--green);color:var(--green)}
+.mark-now-btn:hover{border-color:var(--blue);color:var(--blue2)}
+.mark-reset-btn:hover{border-color:var(--text3)}
+
+/* concepts */
+.concepts{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.concept{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:4px;background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
+
+/* paper link */
+.paper-link{
+  display:inline-flex;align-items:center;gap:4px;
+  font-family:var(--mono);font-size:10px;color:var(--blue2);
+  text-decoration:none;padding:4px 10px;border-radius:5px;
+  background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2);
+  transition:background 0.15s;margin-top:6px;
+}
+.paper-link:hover{background:rgba(59,130,246,0.2)}
+
+/* bel track */
+.bel-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:16px;cursor:pointer;transition:all 0.15s;
+  position:relative;overflow:hidden;
+}
+.bel-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--purple);opacity:0;transition:opacity 0.2s}
+.bel-card:hover{border-color:var(--border2);background:var(--bg3)}
+.bel-card:hover::before,.bel-card.done::before{opacity:1}
+.bel-card.done{border-color:rgba(34,197,94,0.4)}
+.bel-card.done::before{background:var(--green)}
+.bel-card.reading::before{opacity:1;background:var(--orange)}
+.bel-card.reading{border-color:rgba(249,115,22,0.4)}
+.bel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:1rem}
+.bel-year{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.bel-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;line-height:1.3}
+.bel-meta{font-size:11px;color:var(--text3);margin-bottom:8px}
+
+/* notice box */
+.notice{
+  background:linear-gradient(135deg,var(--blue-dim),rgba(168,85,247,0.06));
+  border:1px solid rgba(59,130,246,0.25);border-radius:12px;
+  padding:1rem 1.25rem;margin-bottom:1.5rem;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.notice-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.notice-text{font-size:12px;color:var(--text2);line-height:1.7}
+.notice-text strong{color:var(--blue2)}
+
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .content{padding:1.25rem}
+  .week-top{grid-template-columns:1fr}
+  .detail-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-row">
+    <div>
+      <div class="header-label">Samarth R. Ghanate · 2026</div>
+      <div class="header-title">Deep Learning & Computer Vision Roadmap</div>
+      <div class="header-sub">Paper reading + daily implementation · 2 hours/day · MediSeg project</div>
+    </div>
+    <div class="dual-progress">
+      <div class="prog-row">
+        <div class="prog-label">papers</div>
+        <div class="prog-track"><div class="prog-fill-blue" id="prog-papers" style="width:0%"></div></div>
+        <div class="prog-count" id="count-papers">0/20</div>
+      </div>
+      <div class="prog-row">
+        <div class="prog-label">code</div>
+        <div class="prog-track"><div class="prog-fill-orange" id="prog-code" style="width:0%"></div></div>
+        <div class="prog-count" id="count-code">0/12</div>
+      </div>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat"><div class="dot" style="background:var(--green)"></div><span id="stat-done">0 done</span></div>
+    <div class="stat"><div class="dot" style="background:var(--blue)"></div><span id="stat-reading">0 in progress</span></div>
+    <div class="stat"><div class="dot" style="background:var(--text3)"></div><span>2h daily · read 1h + code 1h</span></div>
+    <div class="stat"><div class="dot" style="background:var(--purple)"></div><span>Belagiannis track parallel</span></div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">Phases</div>
+      <div class="nav-item active" onclick="showTrack('p1',this)">
+        <div class="nav-dot" style="background:var(--green)"></div>
+        <div class="nav-text">Phase 1 — Foundations</div>
+        <div class="nav-count">Wk 1–4</div>
+      </div>
+      <div class="nav-item" onclick="showTrack('p2',this)">
+        <div class="nav-dot" style="background:var(--blue)"></div>
+        <div class="nav-text">Phase 2 — Detection & Seg</div>
+        <div class="nav-count">Wk 5–8</div>
+      </div>
+      <div class="nav-item" onclick="showTrack('p3',this)">
+        <div class="nav-dot" style="background:var(--orange)"></div>
+        <div class="nav-text">Phase 3 — Modern Era</div>
+        <div class="nav-count">Wk 9–12</div>
+      </div>
+      <div class="nav-item" onclick="showTrack('p4',this)">
+        <div class="nav-dot" style="background:var(--purple)"></div>
+        <div class="nav-text">Phase 4 — Specialisation</div>
+        <div class="nav-count">Wk 13–16</div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">Parallel</div>
+      <div class="nav-item" onclick="showTrack('bel',this)">
+        <div class="nav-dot" style="background:var(--purple)"></div>
+        <div class="nav-text">Belagiannis Group Papers</div>
+        <div class="nav-count">3</div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">Daily structure</div>
+      <div class="daily-box">
+        <div class="daily-title">2 hours / day</div>
+        <div class="daily-row">
+          <div class="daily-bar"><div class="daily-fill-blue"></div></div>
+          <div class="daily-tag tag-blue">1h read</div>
+        </div>
+        <div class="daily-row">
+          <div class="daily-bar"><div class="daily-fill-orange"></div></div>
+          <div class="daily-tag tag-orange">1h code</div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--text3);line-height:1.6">
+          Read paper concepts<br>
+          Implement same day<br>
+          Commit to GitHub daily
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- PHASE 1 -->
+    <div id="track-p1" class="track active">
+      <div class="notice">
+        <div class="notice-icon">🧱</div>
+        <div class="notice-text">
+          <strong>Start here — no skipping.</strong> ResNet skip connections appear in U-Net, SegFormer, MonoDepth2 and every architecture you will build later. U-Net is the backbone of all segmentation. Read them in order, implement them immediately.
+        </div>
+      </div>
+      <div class="phase-header">
+        <span class="phase-badge" style="background:var(--green-dim);color:var(--green)">Phase 1</span>
+        <div class="phase-info">
+          <div class="phase-title">Foundations — Architecture Essentials</div>
+          <div class="phase-desc">Weeks 1–4 · ResNet → U-Net → Batch Norm → Dropout · CNN + segmentation from scratch</div>
+        </div>
+      </div>
+      <div class="weeks-list" id="list-p1"></div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div id="track-p2" class="track">
+      <div class="notice">
+        <div class="notice-icon">🎯</div>
+        <div class="notice-text">
+          <strong>Detection and segmentation — the industry core.</strong> Every CV job posting asks for YOLO, FCN, or DeepLab experience. Read the original papers, not just the docs. Your YOLO-World usage in SemanticBot gets 10× deeper when you understand the original architecture.
+        </div>
+      </div>
+      <div class="phase-header">
+        <span class="phase-badge" style="background:var(--blue-dim);color:var(--blue2)">Phase 2</span>
+        <div class="phase-info">
+          <div class="phase-title">Detection & Segmentation</div>
+          <div class="phase-desc">Weeks 5–8 · YOLO · FCN · DeepLabV3 · Mask R-CNN · Train on ADE20K</div>
+        </div>
+      </div>
+      <div class="weeks-list" id="list-p2"></div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div id="track-p3" class="track">
+      <div class="notice">
+        <div class="notice-icon">⚡</div>
+        <div class="notice-text">
+          <strong>The modern era — transformers took over CV in 2020.</strong> ViT replaced CNNs for classification. SegFormer replaced U-Net for segmentation. Attention mechanisms are in every paper published after 2021. You cannot avoid understanding these.
+        </div>
+      </div>
+      <div class="phase-header">
+        <span class="phase-badge" style="background:var(--orange-dim);color:var(--orange2)">Phase 3</span>
+        <div class="phase-info">
+          <div class="phase-title">Modern Era — Transformers & Attention</div>
+          <div class="phase-desc">Weeks 9–12 · Attention · ViT · SegFormer · DINO · Fine-tune on indoor data</div>
+        </div>
+      </div>
+      <div class="weeks-list" id="list-p3"></div>
+    </div>
+
+    <!-- PHASE 4 -->
+    <div id="track-p4" class="track">
+      <div class="notice">
+        <div class="notice-icon">🤖</div>
+        <div class="notice-text">
+          <strong>Your specialisation — camera perception for robotics.</strong> MonoDepth2, PointNet, CLIP and OOD detection are all directly connected to SemanticBot and your thesis. Reading these makes your existing work significantly deeper.
+        </div>
+      </div>
+      <div class="phase-header">
+        <span class="phase-badge" style="background:var(--purple-dim);color:var(--purple)">Phase 4</span>
+        <div class="phase-info">
+          <div class="phase-title">Specialisation — Camera Perception Engineering</div>
+          <div class="phase-desc">Weeks 13–16 · Depth · Point clouds · Vision-language · OOD · Connect to SemanticBot</div>
+        </div>
+      </div>
+      <div class="weeks-list" id="list-p4"></div>
+    </div>
+
+    <!-- BELAGIANNIS -->
+    <div id="track-bel" class="track">
+      <div class="notice">
+        <div class="notice-icon">🎓</div>
+        <div class="notice-text">
+          <strong>Read these in parallel with Phase 1–2.</strong> These are Professor Belagiannis's papers at FAU — your PhD target group. Reading his work deeply before outreach is non-negotiable. Your sim2real Unity work connects directly to his research.
+        </div>
+      </div>
+      <div class="phase-header">
+        <span class="phase-badge" style="background:var(--purple-dim);color:var(--purple)">Parallel</span>
+        <div class="phase-info">
+          <div class="phase-title">Belagiannis Group — FAU Erlangen</div>
+          <div class="phase-desc">3 papers · Sim2Real · OOD Detection · Uncertainty · Read alongside Phase 1 and 2</div>
+        </div>
+      </div>
+      <div class="bel-grid" id="bel-grid"></div>
+      <div id="bel-detail" class="detail" style="margin-top:1rem"></div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<script>
+// ── Data ─────────────────────────────────────────────────────────────
+const phases = {
+  p1:[
+    {
+      id:'resnet', week:'Week 1', color:'blue',
+      paper:{ title:'Deep Residual Learning for Image Recognition', year:'2015',
+        author:'He, Zhang, Ren, Sun · Microsoft Research · CVPR 2016',
+        link:'https://arxiv.org/abs/1512.03385',
+        why:'Introduced skip connections — the single most important architectural idea in modern deep learning. Solves vanishing gradients in very deep networks. Every architecture you will read after this (U-Net, SegFormer, MonoDepth2) uses skip connections.',
+        connection:'You already encountered vanishing gradients when your learning rate exploded in 01_neuron.py. ResNet solves the same problem but in very deep 50+ layer networks. Reading this makes that hands-on experience much deeper.',
+        concepts:['Skip connections','Residual blocks','Vanishing gradients','Batch normalisation','Deep networks']
+      },
+      code:{ title:'CNN on CIFAR-10 from scratch', lang:'PyTorch',
+        file:'06_cnn_cifar.py',
+        steps:['Build Conv2d + MaxPool2d layers','Train on 60k coloured images','Achieve 70%+ accuracy','Visualise filters learned by Conv layers'],
+        connection:'This is the practical foundation — understanding convolution by building it, before reading the advanced architectures that build on it.'
+      },
+      tags:['skip connections','CNN','conv2d'],
+      status:'now'
+    },
+    {
+      id:'unet', week:'Week 2', color:'blue',
+      paper:{ title:'U-Net: Convolutional Networks for Biomedical Image Segmentation', year:'2015',
+        author:'Ronneberger, Fischer, Brox · University of Freiburg · MICCAI 2015',
+        link:'https://arxiv.org/abs/1505.04597',
+        why:'The foundational encoder-decoder architecture for semantic segmentation. Introduced skip connections between encoder and decoder — directly borrowed from ResNet. Still the most widely used segmentation backbone in medical imaging and robotics.',
+        connection:'MediSeg is literally building what this paper describes. Your ADE20K segmentation will use a U-Net variant. Reading the original paper before implementing makes every architecture decision meaningful.',
+        concepts:['Encoder-decoder','Skip connections','Upsampling','Transposed conv','Segmentation maps']
+      },
+      code:{ title:'U-Net from scratch — Oxford Pets segmentation', lang:'PyTorch',
+        file:'07_unet.py',
+        steps:['Implement encoder path (contracting)','Implement decoder path (expanding)','Add skip connections between encoder and decoder','Train on Oxford Pets — cat/dog segmentation','Visualise predicted masks'],
+        connection:'Oxford Pets gives binary masks — perfect for learning encoder-decoder before moving to 150-class ADE20K.'
+      },
+      tags:['encoder-decoder','segmentation','skip connections'],
+      status:'todo'
+    },
+    {
+      id:'batchnorm', week:'Week 3', color:'blue',
+      paper:{ title:'Batch Normalization: Accelerating Deep Network Training', year:'2015',
+        author:'Ioffe, Szegedy · Google · ICML 2015',
+        link:'https://arxiv.org/abs/1502.03167',
+        why:'Explains why training deep networks is unstable and how normalising layer inputs fixes it. Short 9-page paper. Batch normalisation is in every modern architecture — you use it without knowing it via PyTorch defaults.',
+        connection:'When you saw your MNIST loss fluctuate between epochs, batch normalisation would have smoothed that. Adding it to your U-Net implementation shows you understand professional training practice.',
+        concepts:['Internal covariate shift','Normalisation','Training stability','Higher learning rates','Regularisation']
+      },
+      code:{ title:'Add BatchNorm + Dropout to U-Net — improve accuracy', lang:'PyTorch',
+        file:'07_unet.py (update)',
+        steps:['Add nn.BatchNorm2d after each Conv layer','Add nn.Dropout for regularisation','Retrain — observe faster convergence','Compare loss curves with and without BatchNorm','Save and load the improved model'],
+        connection:'This is a direct improvement of Week 2 code — same model, better training technique. Shows iterative engineering thinking.'
+      },
+      tags:['batch norm','dropout','regularisation'],
+      status:'todo'
+    },
+    {
+      id:'ade20k', week:'Week 4', color:'blue',
+      paper:{ title:'Semantic Understanding of Scenes through the ADE20K Dataset', year:'2017',
+        author:'Zhou, Zhao, Puig, Fidler, Barriuso, Torralba · MIT · CVPR 2017',
+        link:'https://arxiv.org/abs/1608.05442',
+        why:'Introduces the ADE20K dataset — 150 semantic classes, 20,000 indoor and outdoor images. This is the dataset you will train on in Phase 2. Understanding the dataset paper before training on it makes evaluation results meaningful.',
+        connection:'ADE20K contains exactly the indoor scenes SemanticBot maps — chairs, desks, walls, monitors. Understanding how the dataset was built and annotated informs how to evaluate your model.',
+        concepts:['Dataset annotation','150 semantic classes','Indoor scenes','Evaluation metrics','Benchmark']
+      },
+      code:{ title:'ADE20K data pipeline — load and visualise', lang:'PyTorch',
+        file:'08_ade20k_pipeline.py',
+        steps:['Download ADE20K subset','Write custom Dataset class','Load RGB + mask pairs','Visualise colour-coded semantic masks','Set up DataLoader with augmentation'],
+        connection:'Building the data pipeline before training is professional practice. Clean data loading = clean training.'
+      },
+      tags:['ADE20K','dataset','data pipeline'],
+      status:'todo'
+    },
+  ],
+  p2:[
+    {
+      id:'yolo', week:'Week 5', color:'blue',
+      paper:{ title:'You Only Look Once: Unified, Real-Time Object Detection', year:'2016',
+        author:'Redmon, Divvala, Girshick, Farhadi · University of Washington · CVPR 2016',
+        link:'https://arxiv.org/abs/1506.02640',
+        why:'The original YOLO paper. You already used YOLO-World in SemanticBot without understanding how it works internally. Reading this explains grid cells, anchor boxes, and multi-scale detection — the ideas behind every YOLO version including YOLO-World.',
+        connection:'You called model.set_classes() and model() without understanding the architecture. This paper explains exactly what is happening inside those calls.',
+        concepts:['Grid cells','Anchor boxes','Objectness score','Multi-scale detection','Single-pass detection']
+      },
+      code:{ title:'Train semantic segmentation on ADE20K — U-Net', lang:'PyTorch',
+        file:'09_ade20k_train.py',
+        steps:['Use U-Net from Week 2 on ADE20K','Handle 150-class cross-entropy loss','Train for 20 epochs','Log loss per epoch','Save best model checkpoint'],
+        connection:'First time training on a real complex dataset. 150 classes instead of 10 — much harder, much more representative of real CV work.'
+      },
+      tags:['YOLO','anchor boxes','detection'],
+      status:'todo'
+    },
+    {
+      id:'fcn', week:'Week 6', color:'blue',
+      paper:{ title:'Fully Convolutional Networks for Semantic Segmentation', year:'2015',
+        author:'Long, Shelhamer, Darrell · UC Berkeley · CVPR 2015',
+        link:'https://arxiv.org/abs/1411.4038',
+        why:'First paper to use a fully convolutional network for pixel-wise segmentation. Replaced fully connected layers with conv layers — the foundation of all modern segmentation architectures including U-Net and DeepLab.',
+        connection:'Your MNIST network had Linear layers at the end. FCN shows why segmentation needs fully convolutional architectures instead — every pixel needs a prediction, not just one class per image.',
+        concepts:['Fully convolutional','Pixel-wise prediction','Transposed convolution','Skip architecture','Dense prediction']
+      },
+      code:{ title:'Evaluate segmentation — mIoU metric', lang:'PyTorch',
+        file:'10_evaluate.py',
+        steps:['Implement mIoU from scratch','Evaluate trained U-Net on ADE20K validation set','Compute per-class IoU','Identify best and worst performing classes','Visualise predictions vs ground truth'],
+        connection:'mIoU appears in every segmentation paper. Computing it yourself means you understand what benchmark numbers actually mean.'
+      },
+      tags:['FCN','mIoU','pixel-wise'],
+      status:'todo'
+    },
+    {
+      id:'deeplab', week:'Week 7', color:'blue',
+      paper:{ title:'Rethinking Atrous Convolution for Semantic Image Segmentation', year:'2017',
+        author:'Chen, Papandreou, Schroff, Adam · Google · arXiv 2017',
+        link:'https://arxiv.org/abs/1706.05587',
+        why:'Introduces dilated (atrous) convolution — increases receptive field without reducing resolution. Current standard for high-resolution segmentation. Used in Cityscapes state-of-the-art. Essential reading for any segmentation role.',
+        connection:'Your U-Net loses resolution through MaxPool and recovers it through upsampling — losing fine details. DeepLab avoids this with dilated convolution. Understanding both approaches makes you more versatile.',
+        concepts:['Atrous convolution','Dilated convolution','ASPP','Receptive field','Cityscapes']
+      },
+      code:{ title:'Add data augmentation — improve ADE20K accuracy', lang:'PyTorch',
+        file:'09_ade20k_train.py (update)',
+        steps:['Add random horizontal flip','Add random crop and resize','Add colour jitter','Retrain with augmentation','Compare mIoU before and after'],
+        connection:'Data augmentation is how you improve accuracy without changing the model. Standard practice in every real training pipeline.'
+      },
+      tags:['dilated conv','augmentation','ASPP'],
+      status:'todo'
+    },
+    {
+      id:'maskrcnn', week:'Week 8', color:'blue',
+      paper:{ title:'Mask R-CNN', year:'2017',
+        author:'He, Gkioxari, Dollár, Girshick · Facebook AI Research · ICCV 2017',
+        link:'https://arxiv.org/abs/1703.06870',
+        why:'Extends object detection with instance segmentation — each object instance gets its own mask, not just each class. Combines detection and segmentation in one model. Foundational for robotics — robots need to know individual objects, not just semantic regions.',
+        connection:'SemanticBot detects object classes. Mask R-CNN would give individual object instances — "chair 1 at position X, chair 2 at position Y" rather than "all chairs are red". A natural upgrade path.',
+        concepts:['Instance segmentation','RoI Align','Bounding box + mask','Feature Pyramid Network','Two-stage detection']
+      },
+      code:{ title:'Visualise and analyse segmentation results', lang:'PyTorch',
+        file:'11_visualise_results.py',
+        steps:['Load trained model','Run on 20 test images','Save side-by-side RGB vs predicted mask','Create confusion matrix','Write summary of what model gets wrong and why'],
+        connection:'Analysis is more important than training. Understanding failure modes is what separates a researcher from someone who just runs scripts.'
+      },
+      tags:['instance seg','Mask R-CNN','FPN'],
+      status:'todo'
+    },
+  ],
+  p3:[
+    {
+      id:'attention', week:'Week 9', color:'orange',
+      paper:{ title:'Attention Is All You Need', year:'2017',
+        author:'Vaswani et al. · Google Brain · NeurIPS 2017',
+        link:'https://arxiv.org/abs/1706.03762',
+        why:'Introduced the transformer architecture. Originally for NLP but now dominates CV. Every modern architecture — ViT, SegFormer, DINO, SAM — is built on the self-attention mechanism described in this paper. Non-negotiable.',
+        connection:'CLIP (which you used in SemanticBot) is a transformer. SegFormer (which you will use next) is a transformer. Understanding self-attention makes every modern architecture legible.',
+        concepts:['Self-attention','Multi-head attention','Query key value','Positional encoding','Transformer block']
+      },
+      code:{ title:'Implement self-attention from scratch', lang:'PyTorch',
+        file:'12_attention.py',
+        steps:['Implement scaled dot-product attention in numpy','Then implement in PyTorch','Add multi-head attention','Visualise attention maps on an image','Understand what each head attends to'],
+        connection:'Writing attention from scratch is the fastest way to truly understand it. Every future paper you read will reference this mechanism.'
+      },
+      tags:['attention','transformer','self-attention'],
+      status:'todo'
+    },
+    {
+      id:'vit', week:'Week 10', color:'orange',
+      paper:{ title:'An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale', year:'2020',
+        author:'Dosovitskiy et al. · Google Brain · ICLR 2021',
+        link:'https://arxiv.org/abs/2010.11929',
+        why:'First paper to apply transformers directly to images, replacing CNNs for classification. Splits image into patches, treats them as tokens. Showed that with enough data, transformers outperform CNNs. Started the transformer revolution in CV.',
+        connection:'Your CIFAR-10 CNN from Week 1 is the "old way". ViT is the "new way". Reading both gives you a complete picture of how the field moved.',
+        concepts:['Image patches','Patch embedding','Class token','Position embedding','Pre-training scale']
+      },
+      code:{ title:'Fine-tune pretrained SegFormer on ADE20K subset', lang:'PyTorch',
+        file:'13_segformer_finetune.py',
+        steps:['Load pretrained SegFormer from HuggingFace','Freeze encoder weights','Fine-tune decoder on your ADE20K subset','Compare mIoU vs your U-Net from Phase 2','Observe how transformer handles long-range dependencies'],
+        connection:'Fine-tuning is the industry-standard approach — you rarely train from scratch on the full model. This is what engineers do at Siemens and robotics companies.'
+      },
+      tags:['ViT','patch embedding','fine-tuning'],
+      status:'todo'
+    },
+    {
+      id:'segformer', week:'Week 11', color:'orange',
+      paper:{ title:'SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers', year:'2021',
+        author:'Xie, Wang, Yu, Anandkumar, Alvarez, Luo · NVIDIA · NeurIPS 2021',
+        link:'https://arxiv.org/abs/2105.15203',
+        why:'Current state-of-the-art for semantic segmentation. Hierarchical transformer encoder + lightweight MLP decoder. Outperforms DeepLab on every benchmark. The architecture you would use if deploying a segmentation model today.',
+        connection:'This is the architecture level of the Belagiannis OOD detection paper — segmentation models like this one are where OOD detection is applied. Understanding the base model makes his paper much clearer.',
+        concepts:['Hierarchical transformer','Mix-FFN','Efficient self-attention','MLP decoder','ADE20K SOTA']
+      },
+      code:{ title:'Export trained model to ONNX — deployment ready', lang:'PyTorch',
+        file:'14_export_onnx.py',
+        steps:['Export fine-tuned SegFormer to ONNX format','Load ONNX model and run inference','Measure latency difference PyTorch vs ONNX','Write C++ inference stub using ONNX Runtime','Connect to SemanticBot pipeline concept'],
+        connection:'This closes the loop — you trained in Python, export to ONNX, deploy in C++. Exactly the pipeline described in every job posting.'
+      },
+      tags:['SegFormer','ONNX','deployment'],
+      status:'todo'
+    },
+    {
+      id:'dino', week:'Week 12', color:'orange',
+      paper:{ title:'Emerging Properties in Self-Supervised Vision Transformers (DINO)', year:'2021',
+        author:'Caron, Touvron, Misra et al. · Facebook AI Research · ICCV 2021',
+        link:'https://arxiv.org/abs/2104.14294',
+        why:'Shows that self-supervised ViTs learn semantic segmentation without any labels — just by watching images. DINO features contain explicit object boundaries visible in attention maps. Foundation for SAM and modern zero-shot approaches.',
+        connection:'SemanticBot uses CLIP for zero-shot language queries. DINO is the vision-only equivalent — zero-shot segmentation from self-supervision. Understanding both gives you a complete picture of foundation models.',
+        concepts:['Self-supervised learning','Knowledge distillation','Self-attention maps','Emergent segmentation','Zero-shot']
+      },
+      code:{ title:'Technical write-up — architecture comparison', lang:'Markdown',
+        file:'docs/architecture_comparison.md',
+        steps:['Compare U-Net vs SegFormer architecturally','Table: params, mIoU, speed, memory','Write 500-word explanation in plain English','Add to GitHub README as technical section','This becomes interview material'],
+        connection:'Writing forces understanding. Explaining architectures in plain English is exactly what PhD applications and job interviews test.'
+      },
+      tags:['DINO','self-supervised','zero-shot'],
+      status:'todo'
+    },
+  ],
+  p4:[
+    {
+      id:'monodepth2', week:'Week 13', color:'purple',
+      paper:{ title:'Digging Into Self-Supervised Monocular Depth Estimation (MonoDepth2)', year:'2019',
+        author:'Godard, Mac Aodha, Firman, Brostow · University College London · ICCV 2019',
+        link:'https://arxiv.org/abs/1806.01260',
+        why:'Self-supervised monocular depth — learns depth from video without ground truth labels. This is the class of work the Belagiannis Sim2Real paper builds directly on. Understanding MonoDepth2 makes his paper trivially clear.',
+        connection:'Your thesis used depth cameras in simulation. MonoDepth2 eliminates the need for depth cameras — estimating depth from a single RGB camera using self-supervision. Directly relevant to your Sim2Real background.',
+        concepts:['Monocular depth','Self-supervised','Photometric loss','Pose estimation','Minimum reprojection']
+      },
+      code:{ title:'Connect segmentation output to SemanticBot', lang:'Python',
+        file:'15_semanticbot_integration.py',
+        steps:['Replace YOLO-World with trained SegFormer','Run segmentation on Replica office0 frames','Lift segmentation masks into 3D using existing depth pipeline','Compare semantic map quality vs YOLO-World approach','Document differences in README'],
+        connection:'This is the full circle — deep learning from MediSeg feeds into SemanticBot. Two projects become one coherent system.'
+      },
+      tags:['monocular depth','Sim2Real','photometric loss'],
+      status:'todo'
+    },
+    {
+      id:'pointnet', week:'Week 14', color:'purple',
+      paper:{ title:'PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation', year:'2017',
+        author:'Qi, Su, Mo, Guibas · Stanford University · CVPR 2017',
+        link:'https://arxiv.org/abs/1612.00593',
+        why:'First paper to apply deep learning directly to raw 3D point clouds — no voxelisation, no projection. Solves permutation invariance of point sets. Foundation for all 3D deep learning work and directly relevant to your Open3D experience.',
+        connection:'You used Open3D to build semantic point clouds in SemanticBot. PointNet is the deep learning layer that could operate directly on those point clouds — classifying and segmenting them end-to-end.',
+        concepts:['Point cloud','Permutation invariance','Global features','T-Net','3D segmentation']
+      },
+      code:{ title:'3D point cloud classification with PointNet', lang:'PyTorch',
+        file:'16_pointnet.py',
+        steps:['Implement simplified PointNet architecture','Train on ModelNet10 (10 3D shape classes)','Achieve 85%+ classification accuracy','Visualise learned point features','Connect to SemanticBot point clouds conceptually'],
+        connection:'Adding 3D deep learning to your skillset directly addresses the sensor fusion + 3D perception gap that appeared in the job analysis.'
+      },
+      tags:['PointNet','3D','point cloud'],
+      status:'todo'
+    },
+    {
+      id:'ood', week:'Week 15', color:'purple',
+      paper:{ title:'Residual Pattern Learning for Pixel-Wise OOD Detection in Semantic Segmentation', year:'2023',
+        author:'Liu, Ding, Tian, Pang, Belagiannis et al. · FAU Erlangen · ICCV 2023',
+        link:'https://arxiv.org/abs/2211.14512',
+        why:'Belagiannis group paper. When a segmentation model sees something it was never trained on, it should flag it as unknown rather than confidently mislabel it. Critical in safety-critical robotics. Uses residual patterns — what the model fails to reconstruct — to detect unknown objects.',
+        connection:'Your collision avoidance work at Siemens Healthineers is exactly the safety-critical context where OOD matters. An unknown obstacle mislabelled as floor is dangerous. One credible sentence about this in your PhD outreach shows you understand practical stakes.',
+        concepts:['OOD detection','Residual patterns','Anomaly segmentation','Safety-critical','Uncertainty estimation']
+      },
+      code:{ title:'Add uncertainty estimation to segmentation model', lang:'PyTorch',
+        file:'17_uncertainty.py',
+        steps:['Add Monte Carlo Dropout to trained SegFormer','Run multiple forward passes — collect variance','High variance = uncertain prediction','Visualise uncertainty maps overlaid on segmentation','Connect to OOD detection conceptually'],
+        connection:'Implementing uncertainty estimation after reading the Belagiannis OOD paper creates a direct, demonstrable connection between his research and your implementation.'
+      },
+      tags:['OOD','uncertainty','safety-critical'],
+      status:'todo'
+    },
+    {
+      id:'clip-paper', week:'Week 16', color:'purple',
+      paper:{ title:'Learning Transferable Visual Models From Natural Language Supervision', year:'2021',
+        author:'Radford, Kim, Hallacy et al. · OpenAI · ICML 2021',
+        link:'https://arxiv.org/abs/2103.00020',
+        why:'Trains vision and text encoders jointly using contrastive learning on 400M image-text pairs. Enables zero-shot recognition — describe an object in words, find it in images. Foundation of YOLO-World and your SemanticBot query engine.',
+        connection:'You implemented CLIP in SemanticBot and used it for language queries. You explained embeddings and cosine similarity. Now read the original paper — it will reframe everything you built with much deeper understanding.',
+        concepts:['Contrastive learning','Zero-shot','Image-text alignment','Embedding space','Natural language supervision']
+      },
+      code:{ title:'Final project — full write-up and demo video', lang:'Markdown + Video',
+        file:'README.md + demo.mp4',
+        steps:['Update MediSeg README with all results and architecture diagrams','Record 3-minute demo: segmentation → 3D map → language query','Write 1-page technical summary for PhD applications','Ensure all code is clean, commented and committed','Push final version to GitHub'],
+        connection:'The deliverable that turns 16 weeks of work into something recruiters and PhD supervisors can actually evaluate.'
+      },
+      tags:['CLIP','contrastive learning','zero-shot'],
+      status:'todo'
+    },
+  ]
+};
+
+const belPapers = [
+  {
+    id:'bel-sim2real', year:'2024', status:'done',
+    title:'Consistency Regularisation for Sim2Real in Monocular Depth Estimation',
+    meta:'El-Ghoussani, Hornauer, Carneiro, Belagiannis · CoLLAs 2024 · FAU Erlangen',
+    link:'https://arxiv.org/abs/2405.17704',
+    tag:'Sim2Real · Domain adaptation · Monocular depth',
+    why:'His DFG-funded Sim2Real project paper. Consistency regularisation + pairwise source loss to adapt depth estimation from synthetic to real without real ground-truth labels.',
+    connection:'You built the Unity multi-sensor simulation framework that generates exactly the synthetic source domain this paper trains on. Your email hook is this paper.',
+    concepts:['Sim2Real','Domain adaptation','Consistency regularisation','Pairwise loss','Monocular depth'],
+    prompts:['Summarise this paper in 2 sentences for a PhD email','What is my strongest connection to this paper?','What is consistency regularisation?']
+  },
+  {
+    id:'bel-ood', year:'2023', status:'reading',
+    title:'Residual Pattern Learning for Pixel-Wise OOD Detection in Semantic Segmentation',
+    meta:'Liu, Ding, Tian, Pang, Belagiannis et al. · ICCV 2023 · FAU Erlangen',
+    link:'https://arxiv.org/abs/2211.14512',
+    tag:'OOD · Segmentation safety · ICCV 2023',
+    why:'Fully his group paper. Safety-critical OOD detection using residual patterns — what the model fails to reconstruct indicates unknown objects. Pixel-level flagging.',
+    connection:'Your Siemens Healthineers collision avoidance work is the exact safety-critical context. An unknown obstacle mislabelled as floor is dangerous in a medical robot.',
+    concepts:['OOD detection','Residual patterns','Safety perception','Anomaly detection','Segmentation uncertainty'],
+    prompts:['What is OOD detection in simple terms?','How does residual pattern learning work?','How does this connect to my Siemens work?']
+  },
+  {
+    id:'bel-tpami', year:'2025', status:'todo',
+    title:'Revisiting Gradient-Based Uncertainty for Monocular Depth Estimation',
+    meta:'Hornauer, El-Ghoussani, Belagiannis · IEEE TPAMI 2025 · FAU Erlangen',
+    link:'https://arxiv.org/abs/2502.05964',
+    tag:'Uncertainty · Depth · TPAMI 2025',
+    why:'Most recent paper from the group. Gradient-based uncertainty for depth reliability. Shows current direction of the Sim2Real + depth work.',
+    connection:'Read after you implement uncertainty estimation in Week 15. The implementation gives you concrete things to say about this paper in a follow-up conversation.',
+    concepts:['Uncertainty estimation','Gradient-based methods','Epistemic uncertainty','Depth reliability','TPAMI'],
+    prompts:['What is uncertainty estimation in depth models?','How does gradient-based uncertainty work?','How does this connect to the Sim2Real paper?']
+  },
+];
+
+// ── State ─────────────────────────────────────────────────────────────
+let state = JSON.parse(localStorage.getItem('sr_dl_state') || '{}');
+if(!state['bel-sim2real']) state['bel-sim2real'] = 'done';
+if(!state['bel-ood']) state['bel-ood'] = 'reading';
+
+function getStatus(id, fallback){ return state[id] || fallback || 'todo'; }
+function setStatus(id, s){ state[id] = s; localStorage.setItem('sr_dl_state', JSON.stringify(state)); renderAll(); }
+
+// ── Render week card ──────────────────────────────────────────────────
+function renderWeek(w){
+  const s = getStatus(w.id, w.status);
+  const statusBadge = s==='done'
+    ? '<span class="week-status status-done">✓ done</span>'
+    : s==='now'
+    ? '<span class="week-status status-now">→ current</span>'
+    : '<span class="week-status status-todo">○ todo</span>';
+  const cardClass = s==='done' ? 'done' : s==='now' ? 'active-week' : '';
+  return `
+<div class="week-card ${cardClass} ${w.color}" id="wcard-${w.id}" onclick="toggleDetail('${w.id}')">
+  <div class="week-top">
+    <div class="week-col">
+      <div class="week-col-label"><span style="color:var(--blue2)">📄</span> <span style="color:var(--blue2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Read</span></div>
+      <div class="week-col-title">${w.paper.title}</div>
+      <div class="week-col-sub">${w.paper.author}</div>
+    </div>
+    <div class="week-col">
+      <div class="week-col-label"><span style="color:var(--orange2)">⌨️</span> <span style="color:var(--orange2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Build</span></div>
+      <div class="week-col-title">${w.code.title}</div>
+      <div class="week-col-sub">${w.code.file}</div>
+    </div>
+  </div>
+  <div class="week-bottom">
+    <div class="week-num">${w.week}</div>
+    <div class="week-tags">
+      ${w.tags.map(t=>`<span class="tag tag-${w.color}">${t}</span>`).join('')}
+    </div>
+    ${statusBadge}
+  </div>
+</div>
+<div class="detail" id="detail-${w.id}">
+  <div class="detail-grid">
+    <div>
+      <div class="detail-section-label">📄 Paper — why read this</div>
+      <div class="detail-body">${w.paper.why}</div>
+      <div class="detail-section-label" style="margin-top:1rem">Your connection</div>
+      <div class="detail-connection">${w.paper.connection}</div>
+      <a href="${w.paper.link}" target="_blank" class="paper-link">Open paper on arXiv ↗</a>
+      <div class="detail-section-label" style="margin-top:1rem">Key concepts</div>
+      <div class="concepts">${w.paper.concepts.map(c=>`<span class="concept">${c}</span>`).join('')}</div>
+    </div>
+    <div>
+      <div class="detail-section-label">⌨️ Code — what to build</div>
+      <ul class="detail-steps">
+        ${w.code.steps.map((s,i)=>`<li><span class="step-num">${String(i+1).padStart(2,'0')}</span>${s}</li>`).join('')}
+      </ul>
+      <div class="detail-section-label" style="margin-top:1rem">Why this code this week</div>
+      <div class="detail-connection" style="color:var(--orange2);background:var(--orange-dim);border-color:var(--orange)">${w.code.connection}</div>
+    </div>
+  </div>
+  <div class="detail-actions">
+    <button class="action-btn primary" onclick="sendP('Explain the paper ${w.paper.title.replace(/'/g,"\\'")} to me from scratch, connecting to my robotics and deep learning background');event.stopPropagation()">Explain paper ↗</button>
+    <button class="action-btn" onclick="sendP('Help me write the code for ${w.code.file.replace(/'/g,"\\'")} step by step');event.stopPropagation()">Help me code this ↗</button>
+    <button class="action-btn" onclick="sendP('What are the key equations in ${w.paper.title.replace(/'/g,"\\'")} and what do they mean?');event.stopPropagation()">Key equations ↗</button>
+    <div class="mark-btns">
+      <button class="mark-btn mark-done-btn" onclick="setStatus('${w.id}','done');event.stopPropagation()">✓ done</button>
+      <button class="mark-btn mark-now-btn" onclick="setStatus('${w.id}','now');event.stopPropagation()">→ current</button>
+      <button class="mark-btn mark-reset-btn" onclick="setStatus('${w.id}','todo');event.stopPropagation()">○ reset</button>
+    </div>
+  </div>
+</div>`;
+}
+
+// ── Render belagiannis ────────────────────────────────────────────────
+function renderBel(){
+  const grid = document.getElementById('bel-grid');
+  grid.innerHTML = belPapers.map(p=>{
+    const s = getStatus(p.id, p.status);
+    return `
+<div class="bel-card ${s}" onclick="toggleBelDetail('${p.id}')">
+  <div class="bel-year">
+    <span>${p.year}</span>
+    ${s==='done'?'<span class="tag tag-green">done</span>':s==='reading'?'<span class="tag tag-orange">reading</span>':'<span class="tag" style="background:var(--bg4);color:var(--text3)">todo</span>'}
+  </div>
+  <div class="bel-title">${p.title}</div>
+  <div class="bel-meta">${p.meta}</div>
+  <span class="tag" style="background:var(--purple-dim);color:var(--purple)">${p.tag}</span>
+</div>`;
+  }).join('');
+}
+
+function toggleBelDetail(id){
+  const p = belPapers.find(x=>x.id===id);
+  const panel = document.getElementById('bel-detail');
+  if(panel.dataset.open === id){ panel.classList.remove('open'); panel.dataset.open=''; return; }
+  panel.innerHTML = `
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1rem">
+  <div>
+    <div style="font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.01em;margin-bottom:4px">${p.title}</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">${p.meta}</div>
+    <a href="${p.link}" target="_blank" class="paper-link" style="margin-top:8px">Open on arXiv ↗</a>
+  </div>
+  <button onclick="document.getElementById('bel-detail').classList.remove('open')" style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:11px;padding:5px 10px;border-radius:7px;cursor:pointer;flex-shrink:0;font-family:var(--mono)">close ×</button>
+</div>
+<div class="detail-grid">
+  <div>
+    <div class="detail-section-label">Why read this</div>
+    <div class="detail-body">${p.why}</div>
+    <div class="detail-section-label" style="margin-top:1rem">Key concepts</div>
+    <div class="concepts">${p.concepts.map(c=>`<span class="concept">${c}</span>`).join('')}</div>
+  </div>
+  <div>
+    <div class="detail-section-label">Your connection</div>
+    <div class="detail-connection">${p.connection}</div>
+    <div class="detail-section-label" style="margin-top:1rem">Ask Claude</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${p.prompts.map(pr=>`<button class="action-btn" onclick="sendP('${pr.replace(/'/g,"\\'")}');event.stopPropagation()">${pr} ↗</button>`).join('')}
+    </div>
+    <div class="mark-btns" style="margin-top:1rem;justify-content:flex-start">
+      <button class="mark-btn mark-done-btn" onclick="setStatus('${p.id}','done');renderBel()">✓ done</button>
+      <button class="mark-btn mark-now-btn" onclick="setStatus('${p.id}','reading');renderBel()">→ reading</button>
+      <button class="mark-btn mark-reset-btn" onclick="setStatus('${p.id}','todo');renderBel()">○ reset</button>
+    </div>
+  </div>
+</div>`;
+  panel.classList.add('open');
+  panel.dataset.open = id;
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ── Toggle detail ─────────────────────────────────────────────────────
+function toggleDetail(id){
+  const el = document.getElementById('detail-'+id);
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.detail').forEach(d=>d.classList.remove('open'));
+  if(!isOpen){ el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+}
+
+// ── Track switching ───────────────────────────────────────────────────
+function showTrack(id, el){
+  document.querySelectorAll('.track').forEach(t=>t.classList.remove('active'));
+  document.getElementById('track-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.detail').forEach(d=>d.classList.remove('open'));
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────
+function updateStats(){
+  const allWeeks = [...phases.p1,...phases.p2,...phases.p3,...phases.p4];
+  const totalPapers = allWeeks.length + belPapers.length;
+  const totalCode = allWeeks.length;
+  const donePapers = allWeeks.filter(w=>getStatus(w.id,w.status)==='done').length
+    + belPapers.filter(p=>getStatus(p.id,p.status)==='done').length;
+  const doneCode = allWeeks.filter(w=>getStatus(w.id,w.status)==='done').length;
+  const inProgress = allWeeks.filter(w=>getStatus(w.id,w.status)==='now').length
+    + belPapers.filter(p=>getStatus(p.id,p.status)==='reading').length;
+
+  document.getElementById('prog-papers').style.width = `${(donePapers/totalPapers)*100}%`;
+  document.getElementById('prog-code').style.width = `${(doneCode/totalCode)*100}%`;
+  document.getElementById('count-papers').textContent = `${donePapers}/${totalPapers}`;
+  document.getElementById('count-code').textContent = `${doneCode}/${totalCode}`;
+  document.getElementById('stat-done').textContent = `${donePapers} done`;
+  document.getElementById('stat-reading').textContent = `${inProgress} in progress`;
+}
+
+// ── Prompt ────────────────────────────────────────────────────────────
+function sendP(text){
+  if(typeof window.sendPrompt==='function'){ window.sendPrompt(text); }
+  else { navigator.clipboard.writeText(text).catch(()=>{}); }
+}
+
+// ── Render all ────────────────────────────────────────────────────────
+function renderAll(){
+  ['p1','p2','p3','p4'].forEach(phase=>{
+    document.getElementById('list-'+phase).innerHTML = phases[phase].map(renderWeek).join('');
+  });
+  renderBel();
+  updateStats();
+}
+
+renderAll();
+</script>
+</body>
+</html>
