@@ -51,3 +51,47 @@ class CIFAR_CNN(nn.Module):
         self.pool = nn.MaxPool2d(2, 2)        # shrinks image by half
         self.fc1  = nn.Linear(8*8*64, 512)   # first fully connected
         self.fc2  = nn.Linear(512, 10)       # output — 10 classes
+    
+    def forward(self, x):
+        x = self.pool(self.relu(self.convo1(x)))
+        x = self.pool(self.relu(self.convo2(x)))
+        x = x.view(-1,4096)
+        x = self.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
+
+model = CIFAR_CNN()
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9) #without momentum:  weight = weight - lr × gradient
+#with momentum:     velocity = 0.9 × velocity + gradient weight = weight - lr × velocity
+
+for epoch in range(10):
+    for i, (images, labels) in enumerate(train_loader):
+        predictions = model(images)
+        loss        = loss_fn(predictions, labels)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        # print every 200 batches
+        if i % 200 == 0:
+            print(f"Epoch {epoch+1} batch {i}/{len(train_loader)} — loss: {loss.item():.4f}")
+
+    print(f"Epoch {epoch+1} complete — loss: {loss.item():.4f}")
+        
+
+
+
+correct = 0
+total = 0
+
+with torch.no_grad():   # no gradients needed for testing
+    for images, labels in test_loader:
+        predictions = model(images)
+        predicted_classes = torch.argmax(predictions, dim=1)
+        correct += (predicted_classes == labels).sum().item()
+        total   += labels.size(0)
+
+accuracy = 100 * correct / total
+print(f"\nTest accuracy: {accuracy:.2f}%")
+print(f"Correctly identified {correct} out of {total} digits")
