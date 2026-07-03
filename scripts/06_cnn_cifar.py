@@ -3,6 +3,9 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+print(f"training on {device}")
+
 #load CIFAR-10#6000colours images 32*32 ,m1 classes 
 #we do this step so that the stored image is in value from 0 to 255 adn then we have to 
 #normalize them hence we use it.
@@ -60,13 +63,15 @@ class CIFAR_CNN(nn.Module):
         x = self.fc2(x)
         return x
 
-model = CIFAR_CNN()
+model = CIFAR_CNN().to(device)
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9) #without momentum:  weight = weight - lr × gradient
 #with momentum:     velocity = 0.9 × velocity + gradient weight = weight - lr × velocity
 
 for epoch in range(10):
     for i, (images, labels) in enumerate(train_loader):
+        images = images.to(device)
+        labels = labels.to(device)
         predictions = model(images)
         loss        = loss_fn(predictions, labels)
         optimizer.zero_grad()
@@ -87,6 +92,8 @@ total = 0
 
 with torch.no_grad():   # no gradients needed for testing
     for images, labels in test_loader:
+        images = images.to(device)
+        labels = labels.to(device)
         predictions = model(images)
         predicted_classes = torch.argmax(predictions, dim=1)
         correct += (predicted_classes == labels).sum().item()
