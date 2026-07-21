@@ -3,6 +3,9 @@ import numpy as np
 import onnxruntime as ort
 from transformers import SegformerForSemanticSegmentation
 import os
+import time
+
+N = 50
 
 # ── Load PyTorch model ────────────────────────────────────────────────
 print("Loading PyTorch model...")
@@ -20,7 +23,7 @@ model.eval()
 # ── Load ONNX model ───────────────────────────────────────────────────
 print("Loading ONNX model...")
 onnx_session = ort.InferenceSession(
-    os.path.expanduser('~/mediseg/segformer_b2.onnx')
+    os.path.expanduser('~/mediseg/models/segformer_b2.onnx')
 )
 
 # ── Create one shared input ───────────────────────────────────────────
@@ -54,3 +57,21 @@ if max_diff < 1e-3:
     print("\nPASS — ONNX matches PyTorch. Export is trustworthy.")
 else:
     print("\nFAIL — outputs diverge. Export is broken, do not use.")
+
+# PyTorch latency
+start = time.perf_counter()
+for _ in range(N):
+    with torch.no_grad():
+        _ = model(pixel_values=dummy).logits
+pytorch_ms = (time.perf_counter() - start) / N * 1000
+
+# ONNX latency
+start = time.perf_counter()
+for _ in range(N):
+    _ = onnx_session.run(None, {"pixel_values": onnx_input})
+onnx_ms = (time.perf_counter() - start) / N * 1000
+
+print(f"\n── Latency benchmark (CPU, avg over {N} runs) ──")
+print(f"PyTorch:  {pytorch_ms:.1f} ms  ({1000/pytorch_ms:.1f} FPS)")
+print(f"ONNX:     {onnx_ms:.1f} ms  ({1000/onnx_ms:.1f} FPS)")
+print(f"Speedup:  {pytorch_ms/onnx_ms:.2f}×")
