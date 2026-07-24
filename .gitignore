@@ -6,3 +6,5 @@ data/
 *.pt
 *.pth
 .DS_Store
+*.onnx
+*.pt
