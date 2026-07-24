@@ -1,56 +1,17 @@
 import os
 import numpy as np
-import torch
-import torchvision.transforms as transforms
-from PIL import Image
-from onnxruntime.quantization import quantize_static, CalibrationDataReader, quantize_dynamic, QuantType
+from onnxruntime.quantization import quantize_dynamic, QuantType
 import onnxruntime as ort
 import time
 
-class ADE20KcalibrationReader(CalibrationDataReader):
-    def __init__(self, data_dir, num_images=100):
-        self.images_dir = os.path.join(data_dir, 'images', 'validation')
-        self.images = sorted([
-            f for f in os.listdir(self.images_dir)
-            if f.endswith('.jpg')
-        ])[:num_images]
-
-        self.transform = transforms.Compose([
-            transforms.Resize((512, 512)),
-            transforms.ToTensor(),
-            transforms.Normalize(
-                mean=[0.485, 0.456, 0.406],
-                std=[0.229, 0.224, 0.225]
-            )
-        ])
-        self.index=0
-
-    def get_next(self):
-        if self.index >= len(self.images):
-            return None
-        
-        img_path = os.path.join(self.images_dir, self.images[self.index])
-        image    = Image.open(img_path).convert('RGB')
-        image    = self.transform(image)
-        image    = image.unsqueeze(0).numpy()
-
-        self.index += 1
-        if self.index % 10 == 0:
-            print(f"Calibrating... {self.index}/100")
-
-        return {"pixel_values": image}
-    
-ROOT      = os.path.expanduser('~/mediseg/data/ADEChallengeData2016')
 fp32_path = os.path.expanduser('~/mediseg/models/segformer_b2.onnx')
 int8_path = os.path.expanduser('~/mediseg/models/segformer_b2_int8.onnx')
 
-print("starting the quantization and calibration")
-reader = ADE20KcalibrationReader(ROOT, num_images=100)
+print("starting dynamic quantization")
 
-quantize_static(
+quantize_dynamic(
     model_input=fp32_path,
     model_output=int8_path,
-    calibration_data_reader=reader,
     weight_type=QuantType.QInt8
 )
 
